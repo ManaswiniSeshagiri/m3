@@ -1,0 +1,5 @@
+create 2 instances in two zones
+install httpd and create html file in both 
+check ip working
+create target group and load balancer.
+copy dns and paste
