@@ -1,0 +1,59 @@
+  1  apt-get update -y
+    2  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    3   unzip awscliv2.zip
+    4   sudo ./aws/install
+    5  aws configure
+    6  curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+    7  sudo mv /tmp/eksctl /usr/local/bin
+    8  eksctl version
+    9  curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+   10  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+   11  kubectl version --client
+   12  ssh-keygen
+ vim sample.yaml
+   22  vim nginx-service.yaml
+
+ 33  eksctl create cluster --name milestone-2 --region us-east-1 --version 1.32 --node-type t2.small --nodes 3 --nodes-min 2 --nodes-max 4 --ssh-access --ssh-public-key /root/.ssh/id_rsa.pub
+   34  kubectl get pods
+   35  kubectl apply -f sample.yaml
+   36  kubectl get pods
+   37  kubectl apply -f nginx-service.yaml
+   38  kubectl get pods
+   39  kubectl get svc
+
+sample.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+nginx-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
