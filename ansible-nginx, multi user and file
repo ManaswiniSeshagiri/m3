@@ -56,3 +56,35 @@ vim authorized_keys
 cd /var/www/html
 ll
 cat index.html
+
+------------------------multiple users-------------------
+---
+- name: adding multiple users
+  hosts: all
+  tasks:
+    - name: create multiple users
+      user:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - mansi
+        - sachin
+        - uday
+        - deepak
+        - hyman
+
+---------------multiple copy file-------------------------
+---
+- name: copied files
+  hosts: all
+  tasks:
+    - name: copied multiple files
+      copy:
+        src: "{{ item }}"
+        dest: /tmp
+      loop:
+        - /etc/passwd
+        - /etc/fstab
+        - /etc/gshadow
+        - /etc/mtab
+        - /etc/group
