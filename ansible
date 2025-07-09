@@ -6,8 +6,14 @@ vim /etc/ssh/sshd_config
 systemctl start sshd
 systemctl enable sshd
 ssh-keygen
+mkdir -p /etc/ansible
+ll -d /etc/ansible
 cd /etc/ansible
 vim hosts
+
+[dev-server]
+node.example.com
+
 cat > index.html
 vim simple.yaml###
 ---
