@@ -1,0 +1,102 @@
+ 1  wget -O /etc/yum.repos.d/jenkins.repo     https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    2  rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+    3  yum upgrade
+    4  yum install java-17-amazon-corretto -y
+    5  yum install jenkins -y
+    6  systemctl start jenkins
+    7  systemctl enable jenkins
+    8  yum install maven
+    9  mvn -v
+ 11  yum install git*
+go to jenkins and download plugins 
+create webhook
+new item create
+add tools
+docker---- yum install docker* -y
+kube -----
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+5  aws configure
+    6  curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+    7  sudo mv /tmp/eksctl /usr/local/bin
+    8  eksctl version
+    9  curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+   10  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+   11  kubectl version --client
+   12  ssh-keygen
+eksctl create cluster --name milestone-2 --region us-east-1 --version 1.32 --node-type t2.small --nodes 3 --nodes-min 2 --nodes-max 4 --ssh-access --ssh-public-key /root/.ssh/id_rsa.pub
+----createssss cluster-----
+attach role to both docker and jenkins instance
+connect jenkins and docker with sshkeygen
+and restart and enable sshd
+ssh-keygen
+   13  cat /root/.ssh/id_rsa.pub
+   14  vim .ssh/authorized_keys
+   15  vim /etc/ssh/sshd_config
+   16  systemctl restart sshd
+   17  systemctl enable sshd
+   18  rsync -avh /var/lib/jenkins/workspace/pro* root@172.31.86.160:/opt
+docker---
+ 9  ip a s
+   10  cd /opt
+   11  ll
+   12  cd pro
+   13  ll
+create ecr and paste push commands in docker terminal pro folder
+now go to kube terminal
+ 12  vim dep.yaml
+   13  vim ser.yaml
+   14  kubectl apply -f dep.yaml
+   15  kubectl apply -f ser.yaml
+   16  kubectl get svc
+
+dep.yaml
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: regapp-deployment
+  labels: 
+     app: regapp
+
+spec:
+  replicas: 2 
+  selector:
+    matchLabels:
+      app: regapp
+
+  template:
+    metadata:
+      labels:
+        app: regapp
+    spec:
+      containers:
+      - name: regapp
+        image: #addd path
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+serv.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: regapp-service
+  labels:
+    app: regapp 
+spec:
+  selector:
+    app: regapp 
+
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+  type: LoadBalancer
+
+copy the svc link with :8080/webapp
